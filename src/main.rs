@@ -26,7 +26,6 @@ mod day1;
 //mod day24;
 //mod day25;
 
-
 fn main() {
     let args: Vec<String> = env::args().collect();
     let mut run_all = false;

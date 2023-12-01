@@ -13,11 +13,10 @@ fn pt1(input: &String) -> u32 {
                 '0'..='9' => {
                     if first == None {
                         first = c.to_digit(10);
-                        
                     }
                     last = c.to_digit(10);
-                },
-                _ => () 
+                }
+                _ => (),
             }
         }
         sum += first.unwrap() * 10 + last.unwrap();
@@ -27,7 +26,9 @@ fn pt1(input: &String) -> u32 {
 
 fn pt2(input: &String) -> u32 {
     let mut sum = 0;
-    let numbers = ["zero", "one","two","three","four","five","six","seven","eight","nine"];
+    let numbers = [
+        "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
+    ];
     for l in input.lines() {
         let mut first = None;
         let mut last = None;
@@ -37,11 +38,10 @@ fn pt2(input: &String) -> u32 {
                 '0'..='9' => {
                     if first == None {
                         first = c.to_digit(10);
-                        
                     }
                     last = c.to_digit(10);
-                },
-                _ => () 
+                }
+                _ => (),
             }
 
             for i_n in 0..numbers.len() {
