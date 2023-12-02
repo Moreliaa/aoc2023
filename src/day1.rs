@@ -32,7 +32,6 @@ fn pt2(input: &String) -> u32 {
     for l in input.lines() {
         let mut first = None;
         let mut last = None;
-        println!("{}", l);
         for (i, c) in l.chars().enumerate() {
             match c {
                 '0'..='9' => {
