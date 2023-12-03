@@ -17,12 +17,14 @@ fn pt1(input: &String) -> i32 {
             let c = c.unwrap();
             let count = c.get(1).unwrap().as_str().parse::<i32>().unwrap();
             let color = c.get(2).unwrap().as_str();
-            if count > match color {
-                "red" => max.0,
-                "green" => max.1,
-                "blue" => max.2,
-                _ => panic!(),
-            } {
+            if count
+                > match color {
+                    "red" => max.0,
+                    "green" => max.1,
+                    "blue" => max.2,
+                    _ => panic!(),
+                }
+            {
                 continue 'lines;
             }
         }
@@ -35,7 +37,7 @@ fn pt2(input: &String) -> i32 {
     let rx_pulls = Regex::new(r"(?=(\d+) ([a-z]+)[,;\n]?\s?)").unwrap();
     let mut powers = 0;
     for l in input.lines() {
-        let mut max = (0,0,0);
+        let mut max = (0, 0, 0);
         for c in rx_pulls.captures_iter(l) {
             let c = c.unwrap();
             let count = c.get(1).unwrap().as_str().parse::<i32>().unwrap();
