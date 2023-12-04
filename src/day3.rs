@@ -95,7 +95,6 @@ fn get_adjacent_nums(input: &Map2D<char>, x_gear: i32, y_gear: i32) -> Vec<u32> 
     if num.len() > 0 && is_adjacent(input, &num, x_gear, y_gear) {
         result.push(sum_digits(input, &num));
     }
-    num = vec![];
     result
 }
 
