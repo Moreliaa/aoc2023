@@ -25,7 +25,6 @@ fn parse_cap(cap: &Captures<'_>, idx: usize) -> Vec<u128> {
         .as_str()
         .trim()
         .split(' ')
-        .into_iter()
         .filter(|a| *a != "")
         .map(|a| a.parse::<u128>().unwrap())
         .collect_vec()
