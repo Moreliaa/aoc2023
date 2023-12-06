@@ -61,7 +61,6 @@ fn pt1(input: &(Vec<u128>, HashMap<(String, String), Vec<(u128, u128, u128)>>)) 
 fn convert(input: &(Vec<u128>, HashMap<(String, String), Vec<(u128, u128, u128)>>), source: &String, target: &String, number: u128) -> u128 {
     for (s, d) in input.1.keys() {
         if source == s {
-            //println!("S: {s} D: {d} Source: {source} Target: {target} Number: {number}");
             for (drs, srs, len) in input.1.get(&(s.clone(),d.clone())).unwrap() {
                 if *srs <= number && number < srs + len {
                     let offset = number - srs;
@@ -83,8 +82,43 @@ fn convert(input: &(Vec<u128>, HashMap<(String, String), Vec<(u128, u128, u128)>
     panic!();
 }
 
-fn pt2(input: &(Vec<u128>, HashMap<(String, String), Vec<(u128, u128, u128)>>)) -> i32 {
-    0
+fn pt2(input: &(Vec<u128>, HashMap<(String, String), Vec<(u128, u128, u128)>>)) -> u128 {
+    let mut i = 0;
+    loop {
+        let mut seed_iter = input.0.iter();
+        let s = convert_pt2(&input, &"location".to_string(),&"seed".to_string(),  i);
+        while let Some(seed) = seed_iter.next() {
+            let len = seed_iter.next().unwrap();
+            if s >= *seed && s < seed + len {
+                return i;
+            }
+        }
+        i += 1;
+    }
+}
+
+fn convert_pt2(input: &(Vec<u128>, HashMap<(String, String), Vec<(u128, u128, u128)>>), source: &String, target: &String, number: u128) -> u128 {
+    for (s, d) in input.1.keys() {
+        if source == d {
+            for (srs, drs, len) in input.1.get(&(s.clone(),d.clone())).unwrap() {
+                if *srs <= number && number < srs + len {
+                    let offset = number - srs;
+                    let next_number = drs + offset;
+                    if target == s {
+                        return next_number;
+                    } else {
+                        return convert_pt2(input, s, target, next_number);
+                    }
+                }
+            }
+            if target == s {
+                return number;
+            } else {
+                return convert_pt2(input, s, target, number);
+            }
+        }
+    }
+    panic!();
 }
 
 #[cfg(test)]
@@ -128,5 +162,6 @@ humidity-to-location map:
 56 93 4".to_string();
         let input = parse_input(input);
         assert_eq!(pt1(&input), 35);
+        assert_eq!(pt2(&input), 46);
     }
 }
