@@ -1,18 +1,20 @@
 use itertools::Itertools;
 
 pub fn run(input: String) {
-    println!("Day1 Pt9: {}", pt1_2(&input, true));
-    println!("Day1 Pt9: {}", pt1_2(&input, false));
+    let result = pt1_2(&input);
+    println!("Day1 Pt9: {}", result.0);
+    println!("Day1 Pt9: {}", result.1);
 }
 
-fn pt1_2(input: &String, is_pt1: bool) -> i32 {
-    let mut sum = 0;
+fn pt1_2(input: &String) -> (i32, i32) {
+    let (mut sum_pt1, mut sum_pt2) = (0, 0);
     for l in input.lines() {
         let nums: Vec<i32> = l.split(' ').map(|v| v.parse::<i32>().unwrap()).collect_vec();
         let r = extrapolate(nums);
-        sum += if is_pt1 { r.0 } else { r.1 };
+        sum_pt1 += r.0;
+        sum_pt2 += r.1;
     }
-    sum
+    (sum_pt1, sum_pt2)
 }
 
 fn extrapolate(nums: Vec<i32>) -> (i32, i32) {
