@@ -1,13 +1,32 @@
-use std::collections::HashMap;
 use std::cmp::Ordering;
+use std::collections::HashMap;
 
-#[derive(PartialEq)]
-#[derive(Debug)]
-enum Type { Five, Four, FullHouse, Three, TwoPair, OnePair, High }
+#[derive(PartialEq, Debug)]
+enum Type {
+    Five,
+    Four,
+    FullHouse,
+    Three,
+    TwoPair,
+    OnePair,
+    High,
+}
 
-const TYPES: [Type;7] = [Type::Five, Type::Four, Type::FullHouse, Type::Three, Type::TwoPair, Type::OnePair, Type::High];
-const CARDS: [char;13] = ['A','K','Q','J','T','9','8','7','6','5','4','3','2'];
-const CARDS_PT2: [char;13] = ['A','K','Q','T','9','8','7','6','5','4','3','2','J'];
+const TYPES: [Type; 7] = [
+    Type::Five,
+    Type::Four,
+    Type::FullHouse,
+    Type::Three,
+    Type::TwoPair,
+    Type::OnePair,
+    Type::High,
+];
+const CARDS: [char; 13] = [
+    'A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2',
+];
+const CARDS_PT2: [char; 13] = [
+    'A', 'K', 'Q', 'T', '9', '8', '7', '6', '5', '4', '3', '2', 'J',
+];
 
 pub fn run(input: String) {
     println!("Day7 Pt1: {}", pt1(&input));
@@ -70,7 +89,7 @@ fn get_type(a: &(&str, &str)) -> Type {
         3 => Type::Three,
         2 if cards.len() == 3 => Type::TwoPair,
         2 => Type::OnePair,
-        _ => Type::High
+        _ => Type::High,
     }
 }
 
@@ -84,7 +103,7 @@ fn get_prio(t: Type) -> usize {
 }
 
 fn get_prio_card(t: char, is_pt1: bool) -> usize {
-    let cards = if is_pt1 {CARDS} else {CARDS_PT2};
+    let cards = if is_pt1 { CARDS } else { CARDS_PT2 };
     for i in 0..cards.len() {
         if cards[i] == t {
             return i;
@@ -119,7 +138,7 @@ fn get_type_pt2(a: &(&str, &str)) -> Type {
     let joker = cards.get(&'J');
     let joker = match joker {
         Some(val) => *val,
-        None => 0
+        None => 0,
     };
     for (c, val) in cards.iter_mut() {
         if *c != 'J' {
@@ -137,7 +156,7 @@ fn get_type_pt2(a: &(&str, &str)) -> Type {
         2 if joker == 0 && cards.len() == 3 => Type::TwoPair,
         2 => Type::OnePair,
         1 => Type::High,
-        _ => panic!("{:?}", cards)
+        _ => panic!("{:?}", cards),
     }
 }
 
@@ -177,7 +196,8 @@ mod tests {
 T55J5 684
 KK677 28
 KTJJT 220
-QQQJA 483".to_string();
+QQQJA 483"
+            .to_string();
         assert_eq!(pt1(&input), 6440);
         assert_eq!(pt2(&input), 5905);
     }

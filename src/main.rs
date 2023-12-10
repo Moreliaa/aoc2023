@@ -1,6 +1,7 @@
 use aoc_lib::input_reader;
 use std::env;
 mod day1;
+mod day10;
 mod day2;
 mod day3;
 mod day4;
@@ -9,7 +10,6 @@ mod day6;
 mod day7;
 mod day8;
 mod day9;
-//mod day10;
 //mod day11;
 //mod day12;
 //mod day13;
@@ -33,7 +33,7 @@ fn main() {
     if args.len() > 1 && (args[1] == "a" || args[1] == "all") {
         run_all = true;
     }
-    day9::run(input("9"));
+    day10::run(input("10"));
     if run_all {
         day1::run(input("1"));
         day2::run(input("2"));
@@ -43,7 +43,7 @@ fn main() {
         day6::run();
         day7::run(input("7"));
         day8::run(input("8"));
-        //day10::run();
+        day9::run(input("9"));
         //day11::run();
         //day12::run(input("12"));
         //day13::run(input("13"));

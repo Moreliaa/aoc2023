@@ -7,7 +7,7 @@ pub fn run() {
     println!("Day6 Pt2: {}", pt1_2(&times, &dist));
 }
 
-fn pt1_2(times:&[i128], dist:&[i128]) -> i128 {
+fn pt1_2(times: &[i128], dist: &[i128]) -> i128 {
     let mut result = 1;
     for i in 0..times.len() {
         result *= count_wins(times[i], dist[i]);
@@ -15,7 +15,7 @@ fn pt1_2(times:&[i128], dist:&[i128]) -> i128 {
     result
 }
 
-fn count_wins(time: i128, record:i128) -> i128 {
+fn count_wins(time: i128, record: i128) -> i128 {
     let mut count = 0;
     for i in 0..=time {
         if i * (time - i) > record {

@@ -8,7 +8,12 @@ pub fn run(input: String) {
     println!("Day5 Pt2: {}", pt2(&input));
 }
 
-fn parse_input<'a>(input: String) -> (Vec<u128>, HashMap<(String, String), Vec<(u128, u128, u128)>>) {
+fn parse_input<'a>(
+    input: String,
+) -> (
+    Vec<u128>,
+    HashMap<(String, String), Vec<(u128, u128, u128)>>,
+) {
     let mut seeds = vec![];
     let mut maps = HashMap::new();
     let mut stage = 0;
@@ -38,7 +43,11 @@ fn parse_input<'a>(input: String) -> (Vec<u128>, HashMap<(String, String), Vec<(
                 new_block = false;
             } else {
                 println!("{l}");
-                let l_split = l.split(' ').map(|v| v.parse::<u128>().unwrap()).collect_tuple().unwrap();
+                let l_split = l
+                    .split(' ')
+                    .map(|v| v.parse::<u128>().unwrap())
+                    .collect_tuple()
+                    .unwrap();
                 maps.entry(current.clone()).and_modify(|c| c.push(l_split));
             }
         }
@@ -46,22 +55,35 @@ fn parse_input<'a>(input: String) -> (Vec<u128>, HashMap<(String, String), Vec<(
     (seeds, maps)
 }
 
-fn pt1(input: &(Vec<u128>, HashMap<(String, String), Vec<(u128, u128, u128)>>)) -> u128 {
+fn pt1(
+    input: &(
+        Vec<u128>,
+        HashMap<(String, String), Vec<(u128, u128, u128)>>,
+    ),
+) -> u128 {
     let mut lowest_loc: Option<u128> = None;
     for seed in input.0.iter() {
         let loc = convert(&input, &"seed".to_string(), &"location".to_string(), *seed);
         lowest_loc = match lowest_loc {
             Some(val) => Some(val.min(loc)),
-            None => Some(loc)
-        }; 
+            None => Some(loc),
+        };
     }
     lowest_loc.unwrap()
 }
 
-fn convert(input: &(Vec<u128>, HashMap<(String, String), Vec<(u128, u128, u128)>>), source: &String, target: &String, number: u128) -> u128 {
+fn convert(
+    input: &(
+        Vec<u128>,
+        HashMap<(String, String), Vec<(u128, u128, u128)>>,
+    ),
+    source: &String,
+    target: &String,
+    number: u128,
+) -> u128 {
     for (s, d) in input.1.keys() {
         if source == s {
-            for (drs, srs, len) in input.1.get(&(s.clone(),d.clone())).unwrap() {
+            for (drs, srs, len) in input.1.get(&(s.clone(), d.clone())).unwrap() {
                 if *srs <= number && number < srs + len {
                     let offset = number - srs;
                     let next_number = drs + offset;
@@ -82,11 +104,16 @@ fn convert(input: &(Vec<u128>, HashMap<(String, String), Vec<(u128, u128, u128)>
     panic!();
 }
 
-fn pt2(input: &(Vec<u128>, HashMap<(String, String), Vec<(u128, u128, u128)>>)) -> u128 {
+fn pt2(
+    input: &(
+        Vec<u128>,
+        HashMap<(String, String), Vec<(u128, u128, u128)>>,
+    ),
+) -> u128 {
     let mut i = 0;
     loop {
         let mut seed_iter = input.0.iter();
-        let s = convert_pt2(&input, &"location".to_string(),&"seed".to_string(),  i);
+        let s = convert_pt2(&input, &"location".to_string(), &"seed".to_string(), i);
         while let Some(seed) = seed_iter.next() {
             let len = seed_iter.next().unwrap();
             if s >= *seed && s < seed + len {
@@ -97,10 +124,18 @@ fn pt2(input: &(Vec<u128>, HashMap<(String, String), Vec<(u128, u128, u128)>>)) 
     }
 }
 
-fn convert_pt2(input: &(Vec<u128>, HashMap<(String, String), Vec<(u128, u128, u128)>>), source: &String, target: &String, number: u128) -> u128 {
+fn convert_pt2(
+    input: &(
+        Vec<u128>,
+        HashMap<(String, String), Vec<(u128, u128, u128)>>,
+    ),
+    source: &String,
+    target: &String,
+    number: u128,
+) -> u128 {
     for (s, d) in input.1.keys() {
         if source == d {
-            for (srs, drs, len) in input.1.get(&(s.clone(),d.clone())).unwrap() {
+            for (srs, drs, len) in input.1.get(&(s.clone(), d.clone())).unwrap() {
                 if *srs <= number && number < srs + len {
                     let offset = number - srs;
                     let next_number = drs + offset;
@@ -159,7 +194,8 @@ temperature-to-humidity map:
 
 humidity-to-location map:
 60 56 37
-56 93 4".to_string();
+56 93 4"
+            .to_string();
         let input = parse_input(input);
         assert_eq!(pt1(&input), 35);
         assert_eq!(pt2(&input), 46);

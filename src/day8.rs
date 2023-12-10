@@ -1,7 +1,7 @@
-use std::collections::HashMap;
-use num::integer::lcm;
 use fancy_regex::Regex;
 use itertools::Itertools;
+use num::integer::lcm;
+use std::collections::HashMap;
 
 pub fn run(input: String) {
     let (instr, map) = parse_input(&input);
