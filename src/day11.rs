@@ -2,7 +2,7 @@ use aoc_lib::map2d::Map2D;
 
 pub fn run(input: String) {
     let map = Map2D::from_string(input);
-    println!("Day11 Pt1: {}", pt1_2(&map , 1));
+    println!("Day11 Pt1: {}", pt1_2(&map, 1));
     println!("Day11 Pt2: {}", pt1_2(&map, 1000000 - 1));
 }
 
@@ -15,12 +15,26 @@ fn pt1_2(input: &Map2D<char>, expansion: i128) -> i128 {
             let s2 = stars[j];
             let rows_to_check = [s2.0.min(s1.0), s2.0.max(s1.0)];
             let cols_to_check = [s2.1.min(s1.1), s2.1.max(s1.1)];
-            let distance_row_expansion = rows.iter().fold(0, |acc, r| if rows_to_check[0] < *r && *r < rows_to_check[1] { acc + expansion } else { acc });
-            let distance_col_expansion = cols.iter().fold(0, |acc, c| if cols_to_check[0] < *c && *c < cols_to_check[1] { acc + expansion } else { acc });
-            sum += rows_to_check[1] - rows_to_check[0] + cols_to_check[1] - cols_to_check[0] + distance_row_expansion + distance_col_expansion;
+            let distance_row_expansion = rows.iter().fold(0, |acc, r| {
+                if rows_to_check[0] < *r && *r < rows_to_check[1] {
+                    acc + expansion
+                } else {
+                    acc
+                }
+            });
+            let distance_col_expansion = cols.iter().fold(0, |acc, c| {
+                if cols_to_check[0] < *c && *c < cols_to_check[1] {
+                    acc + expansion
+                } else {
+                    acc
+                }
+            });
+            sum += rows_to_check[1] - rows_to_check[0] + cols_to_check[1] - cols_to_check[0]
+                + distance_row_expansion
+                + distance_col_expansion;
         }
     }
-    sum 
+    sum
 }
 
 fn read_map(input: &Map2D<char>) -> (Vec<(i128, i128)>, Vec<i128>, Vec<i128>) {

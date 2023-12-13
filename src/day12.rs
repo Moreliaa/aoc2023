@@ -1,5 +1,6 @@
 use itertools::Itertools;
-use aoc_lib::tree::Tree;
+use std::collections::HashMap;
+
 
 pub fn run(input: String) {
     println!("Day12 Pt1: {}", pt1(&input));
@@ -11,7 +12,12 @@ fn pt1(input: &String) -> i32 {
     for line in input.lines() {
         let mut split = line.split(' ');
         let row = split.next().unwrap().chars().collect_vec();
-        let numbers = split.next().unwrap().split(',').map(|n| n.parse::<i32>().unwrap()).collect_vec();
+        let numbers = split
+            .next()
+            .unwrap()
+            .split(',')
+            .map(|n| n.parse::<i32>().unwrap())
+            .collect_vec();
         let mut poss = vec![];
         for c in row {
             if c == '?' {
@@ -23,7 +29,7 @@ fn pt1(input: &String) -> i32 {
                     for p in poss {
                         next.push(p.clone() + ".");
                         next.push(p + "#");
-                    } 
+                    }
                     poss = next;
                 }
             } else {
@@ -37,7 +43,6 @@ fn pt1(input: &String) -> i32 {
             }
         }
 
-   
         'outer: for p in poss {
             let mut count = 0;
             let mut current_num_idx = 0;
@@ -45,24 +50,31 @@ fn pt1(input: &String) -> i32 {
             for (idx, c) in p.chars().enumerate() {
                 let num = numbers.get(current_num_idx);
                 match num {
-                    Some(val) if count > *val => { continue 'outer; },
-                    None if count > 0 => { continue 'outer; },
-                    _ => ()
+                    Some(val) if count > *val => {
+                        continue 'outer;
+                    }
+                    None if count > 0 => {
+                        continue 'outer;
+                    }
+                    _ => (),
                 };
                 if c == '#' {
                     last_spring = true;
                     count += 1;
-                    
                 } else {
                     if last_spring {
                         match num {
-                            Some(val) if count != *val => { continue 'outer; },
-                            None if count > 0 => { continue 'outer; },
-                            _ => ()
+                            Some(val) if count != *val => {
+                                continue 'outer;
+                            }
+                            None if count > 0 => {
+                                continue 'outer;
+                            }
+                            _ => (),
                         };
                         current_num_idx += 1;
                         last_spring = false;
-                        
+
                         count = 0;
                     }
                 }
@@ -72,29 +84,33 @@ fn pt1(input: &String) -> i32 {
             }
             let num = numbers.get(current_num_idx);
             match num {
-                Some(val) if count != *val => { continue 'outer; },
-                None if count > 0 => { continue 'outer; },
-                _ => ()
+                Some(val) if count != *val => {
+                    continue 'outer;
+                }
+                None if count > 0 => {
+                    continue 'outer;
+                }
+                _ => (),
             };
             sum += 1;
         }
-
     }
     sum
 }
 
 #[derive(Clone)]
 struct Node {
-    count: i32,
-    current_num_idx: usize,
+    count: u8,
+    current_num_idx: u8,
     last_spring: bool,
-    is_failure: bool
+    is_failure: bool,
 }
 
 #[allow(unused_assignments)]
 fn pt2(input: &String) -> i32 {
     let mut sum = 0;
-    for line in input.lines() {
+    for (line_idx, line) in input.lines().enumerate() {
+        println!("Line: {line_idx}");
         let mut split = line.split(' ');
         let mut row = split.next().unwrap().to_string();
         let cloned_row = row.clone();
@@ -102,36 +118,51 @@ fn pt2(input: &String) -> i32 {
         for _ in 0..4 {
             row = row + "?" + cloned_row;
         }
-        
+
         let row = row.chars().collect_vec();
-        let mut numbers = split.next().unwrap().split(',').map(|n| n.parse::<i32>().unwrap()).collect_vec();
+        let mut numbers = split
+            .next()
+            .unwrap()
+            .split(',')
+            .map(|n| n.parse::<u8>().unwrap())
+            .collect_vec();
         let numbers_cloned = numbers.clone();
         for _ in 0..4 {
             numbers.append(&mut numbers_cloned.clone());
         }
-        let mut poss = Tree::new(Node {
+        let mut poss = vec![Node {
             count: 0,
             current_num_idx: 0,
             last_spring: false,
-            is_failure: false
-        });
-        for (row_idx,c) in row.iter().enumerate() {
-            for i in 0..poss.get_node_count() {
-                if poss.get_child_ids(i).len() > 0 {
-                    continue;
-                }
+            is_failure: false,
+        }];
+        let mut next_poss = vec![];
+        let row_len = row.len();
+        for (row_idx, c) in row.iter().enumerate() {
+            println! {"row_len: {row_len} row_idx: {row_idx} ids: {:?}", poss.len()};
+            while let Some(mut p) = poss.pop() {
                 let mut p_count = 0;
                 let mut p_current_num_idx = 0;
                 let mut p_last_spring = false;
                 {
-                    let p = poss.get_val(i);
                     if p.is_failure {
-                        continue;
+                        panic!();
                     }
                     p_count = p.count;
                     p_current_num_idx = p.current_num_idx;
                     p_last_spring = p.last_spring;
                 }
+
+                let mut remaining_numbers_sum = 0;
+                for i_r in p_current_num_idx + 1..numbers.len() as u8 {
+                    remaining_numbers_sum += numbers[i_r as usize];
+                }
+                if numbers.len() as u8 > p_current_num_idx {
+                remaining_numbers_sum += numbers.len() as u8 - p_current_num_idx - 1;}
+                if remaining_numbers_sum > (row_len - row_idx) as u8 {
+                    continue;
+                }
+
                 // ?
                 if *c == '?' {
                     // ? -> #
@@ -139,31 +170,41 @@ fn pt2(input: &String) -> i32 {
                         count: p_count + 1,
                         current_num_idx: p_current_num_idx,
                         last_spring: true,
-                        is_failure: false
+                        is_failure: false,
                     };
 
                     if row_idx == row.len() - 1 {
-                        if p_current_num_idx < numbers.len() - 1 {
+                        if p_current_num_idx < numbers.len() as u8 - 1 {
                             next_node.is_failure = true;
                         }
-                        let num = numbers.get(p_current_num_idx);
+                        let num = numbers.get(p_current_num_idx as usize);
                         match num {
-                            Some(val) if next_node.count != *val => { next_node.is_failure = true; },
-                            None if next_node.count > 0 => { next_node.is_failure = true; },
-                            _ => ()
+                            Some(val) if next_node.count != *val => {
+                                next_node.is_failure = true;
+                            }
+                            None if next_node.count > 0 => {
+                                next_node.is_failure = true;
+                            }
+                            _ => (),
                         };
                     }
 
-                    poss.add_child(i, next_node);
+                    if !next_node.is_failure {
+                        next_poss.push(next_node);
+                    }
 
                     // ? -> .
-                    let mut next_node = poss.get_val(i).clone();
-                    let num = numbers.get(p_current_num_idx);
+                    let mut next_node = p.clone();
+                    let num = numbers.get(p_current_num_idx as usize);
                     if p_last_spring {
                         match num {
-                            Some(val) if p_count != *val => { next_node.is_failure = true; },
-                            None if p_count > 0 => { next_node.is_failure = true; },
-                            _ => ()
+                            Some(val) if p_count != *val => {
+                                next_node.is_failure = true;
+                            }
+                            None if p_count > 0 => {
+                                next_node.is_failure = true;
+                            }
+                            _ => (),
                         };
                         next_node.current_num_idx += 1;
                         next_node.last_spring = false;
@@ -171,66 +212,82 @@ fn pt2(input: &String) -> i32 {
                     }
 
                     if row_idx == row.len() - 1 {
-                        if next_node.current_num_idx < numbers.len() - 1 {
+                        if next_node.current_num_idx < numbers.len() as u8 - 1 {
                             next_node.is_failure = true;
                         }
-                        let num = numbers.get(next_node.current_num_idx);
+                        let num = numbers.get(next_node.current_num_idx as usize);
                         match num {
-                            Some(val) if next_node.count != *val => { next_node.is_failure = true; },
-                            None if next_node.count > 0 => { next_node.is_failure = true; },
-                            _ => ()
+                            Some(val) if next_node.count != *val => {
+                                next_node.is_failure = true;
+                            }
+                            None if next_node.count > 0 => {
+                                next_node.is_failure = true;
+                            }
+                            _ => (),
                         };
                     }
-
-                    poss.add_child(i, next_node);
-
+                    if !next_node.is_failure {
+                        next_poss.push(next_node);
+                    }
                 } else {
                     // # / .
-                    let p = poss.get_mut_val(i);
-                    let num = numbers.get(p_current_num_idx);
+                    let num = numbers.get(p_current_num_idx as usize);
                     match num {
-                        Some(val) if p_count > *val => { p.is_failure = true; continue; },
-                        None if p_count > 0 => { p.is_failure = true; continue; },
-                        _ => ()
+                        Some(val) if p_count > *val => {
+                            p.is_failure = true;
+                        }
+                        None if p_count > 0 => {
+                            p.is_failure = true;
+                        }
+                        _ => (),
                     };
                     if *c == '#' {
                         p.last_spring = true;
                         p.count += 1;
-                        
                     } else {
                         if p_last_spring {
                             match num {
-                                Some(val) if p_count != *val => { p.is_failure = true; continue; },
-                                None if p_count > 0 => { p.is_failure = true; continue; },
-                                _ => ()
+                                Some(val) if p_count != *val => {
+                                    p.is_failure = true;
+                                }
+                                None if p_count > 0 => {
+                                    p.is_failure = true;
+                                }
+                                _ => (),
                             };
                             p.current_num_idx += 1;
                             p.last_spring = false;
-                            
+
                             p.count = 0;
                         }
                     }
 
                     if row_idx == row.len() - 1 {
-                        if p.current_num_idx < numbers.len() - 1 {
+                        if p.current_num_idx < numbers.len() as u8 - 1 {
                             p.is_failure = true;
                         }
-                        let num = numbers.get(p.current_num_idx);
+                        let num = numbers.get(p.current_num_idx as usize);
                         match num {
-                            Some(val) if p.count != *val => { p.is_failure = true; },
-                            None if p.count > 0 => { p.is_failure = true; },
-                            _ => ()
+                            Some(val) if p.count != *val => {
+                                p.is_failure = true;
+                            }
+                            None if p.count > 0 => {
+                                p.is_failure = true;
+                            }
+                            _ => (),
                         };
                     }
+                    if !p.is_failure {
+                        next_poss.push(p.clone());
+                    }
                 }
-                
             }
+            //println!("{:?}", next_ids);
+            poss = next_poss;
+            next_poss = vec![];
         }
-        for i in 0..poss.get_node_count() {
-            if poss.get_child_ids(i).len() == 0 && !poss.get_val(i).is_failure {
-                sum += 1;
-            }
-        }
+        println! {"row_len: {row_len} ids: {:?}", poss.len()};
+        sum += poss.len() as i32;
     }
     sum
 }
