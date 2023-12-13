@@ -1,5 +1,4 @@
 use itertools::Itertools;
-use std::collections::HashMap;
 
 
 pub fn run(input: String) {
@@ -47,7 +46,7 @@ fn pt1(input: &String) -> i32 {
             let mut count = 0;
             let mut current_num_idx = 0;
             let mut last_spring = false;
-            for (idx, c) in p.chars().enumerate() {
+            for (_, c) in p.chars().enumerate() {
                 let num = numbers.get(current_num_idx);
                 match num {
                     Some(val) if count > *val => {
