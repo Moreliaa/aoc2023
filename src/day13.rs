@@ -7,8 +7,11 @@ pub fn run(input: String) {
 }
 
 fn parse_input(input: String) -> Vec<Map2D<char>> {
-    input.split("\n\n").map(|a| Map2D::from_string(a.to_string())).collect()
-} 
+    input
+        .split("\n\n")
+        .map(|a| Map2D::from_string(a.to_string()))
+        .collect()
+}
 
 fn pt1(input: &Vec<Map2D<char>>) -> i32 {
     input.iter().fold(0, |acc, map| acc + summarize(map, 0))
@@ -20,15 +23,12 @@ fn pt2(input: &Vec<Map2D<char>>) -> i32 {
 
 fn summarize(map: &Map2D<char>, errors_expected: i32) -> i32 {
     if let Some(v) = check_vertical(map, errors_expected) {
-        println!("v {v}");
         return v;
     };
 
     if let Some(h) = check_horizontal(map, errors_expected) {
-        println!("h {h}");
         return h * 100;
     };
-    map.print();
     panic!()
 }
 
@@ -49,7 +49,7 @@ fn check_vertical(map: &Map2D<char>, errors_expected: i32) -> Option<i32> {
                         }
                         return Some(left + 1);
                     }
-                    
+
                     for y in 0..map.height() {
                         if *map.get(col_l, y).unwrap() != *map.get(col_r, y).unwrap() {
                             errors_found += 1;
@@ -58,8 +58,8 @@ fn check_vertical(map: &Map2D<char>, errors_expected: i32) -> Option<i32> {
                             }
                         }
                     }
-                    
-                    sub_offset += 1; 
+
+                    sub_offset += 1;
                 }
             }
         }
@@ -94,7 +94,7 @@ fn check_horizontal(map: &Map2D<char>, errors_expected: i32) -> Option<i32> {
                         }
                     }
 
-                    sub_offset += 1; 
+                    sub_offset += 1;
                 }
             }
         }
@@ -123,7 +123,8 @@ mod tests {
 #####.##.
 #####.##.
 ..##..###
-#....#..#".to_string();
+#....#..#"
+            .to_string();
         let input = parse_input(input);
         assert_eq!(pt1(&input), 405);
     }

@@ -1,6 +1,5 @@
 use itertools::Itertools;
 
-
 pub fn run(input: String) {
     println!("Day12 Pt1: {}", pt1(&input));
     println!("Day12 Pt2: {}", pt2(&input));
@@ -157,7 +156,8 @@ fn pt2(input: &String) -> i32 {
                     remaining_numbers_sum += numbers[i_r as usize];
                 }
                 if numbers.len() as u8 > p_current_num_idx {
-                remaining_numbers_sum += numbers.len() as u8 - p_current_num_idx - 1;}
+                    remaining_numbers_sum += numbers.len() as u8 - p_current_num_idx - 1;
+                }
                 if remaining_numbers_sum > (row_len - row_idx) as u8 {
                     continue;
                 }
