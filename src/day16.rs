@@ -1,6 +1,6 @@
 pub fn run(input: String) {
-    println!("Day1 Pt1: {}", pt1(&input));
-    println!("Day1 Pt2: {}", pt2(&input));
+    println!("Day16 Pt1: {}", pt1(&input));
+    println!("Day16 Pt2: {}", pt2(&input));
 }
 
 fn pt1(input: &String) -> i32 {

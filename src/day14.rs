@@ -177,7 +177,6 @@ fn pt2(input: &mut Map2D<char>) -> i32 {
     let mut idx_first_cycle = 0;
     'outer: for i in 0..loads_vec.len() {
         for j in i..i + cycle_len {
-            println! {"{:?}", slice};
             if slice[j - i] != loads_vec[j] {
                 continue 'outer;
             }
