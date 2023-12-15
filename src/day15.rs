@@ -1,5 +1,3 @@
-use itertools::Itertools;
-
 pub fn run(input: String) {
     println!("Day15 Pt1: {}", pt1(&input));
     println!("Day15 Pt2: {}", pt2(&input));
