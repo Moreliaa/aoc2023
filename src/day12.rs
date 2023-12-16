@@ -1,4 +1,5 @@
 use itertools::Itertools;
+use std::collections::HashMap;
 
 pub fn run(input: String) {
     println!("Day12 Pt1: {}", pt1(&input));
@@ -96,7 +97,7 @@ fn pt1(input: &String) -> i32 {
     sum
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 struct Node {
     count: u8,
     current_num_idx: u8,
@@ -105,7 +106,7 @@ struct Node {
 }
 
 #[allow(unused_assignments)]
-fn pt2(input: &String) -> i32 {
+fn pt2(input: &String) -> i128 {
     let mut sum = 0;
     for (line_idx, line) in input.lines().enumerate() {
         println!("Line: {line_idx}");
@@ -128,17 +129,18 @@ fn pt2(input: &String) -> i32 {
         for _ in 0..4 {
             numbers.append(&mut numbers_cloned.clone());
         }
-        let mut poss = vec![Node {
+        let mut poss:HashMap<Node, i128> = HashMap::new();
+        poss.insert(Node {
             count: 0,
             current_num_idx: 0,
             last_spring: false,
             is_failure: false,
-        }];
-        let mut next_poss = vec![];
+        }, 1);
+        let mut next_poss:HashMap<Node, i128> = HashMap::new();
         let row_len = row.len();
         for (row_idx, c) in row.iter().enumerate() {
             println! {"row_len: {row_len} row_idx: {row_idx} ids: {:?}", poss.len()};
-            while let Some(mut p) = poss.pop() {
+            for (mut p, instances) in poss {
                 let mut p_count = 0;
                 let mut p_current_num_idx = 0;
                 let mut p_last_spring = false;
@@ -189,7 +191,7 @@ fn pt2(input: &String) -> i32 {
                     }
 
                     if !next_node.is_failure {
-                        next_poss.push(next_node);
+                        next_poss.entry(next_node).and_modify(|v| {*v += instances;}).or_insert(instances);
                     }
 
                     // ? -> .
@@ -226,7 +228,7 @@ fn pt2(input: &String) -> i32 {
                         };
                     }
                     if !next_node.is_failure {
-                        next_poss.push(next_node);
+                        next_poss.entry(next_node).and_modify(|v| {*v += instances;}).or_insert(instances);
                     }
                 } else {
                     // # / .
@@ -277,16 +279,15 @@ fn pt2(input: &String) -> i32 {
                         };
                     }
                     if !p.is_failure {
-                        next_poss.push(p.clone());
+                        next_poss.entry(p.clone()).and_modify(|v| {*v += instances;}).or_insert(instances);
                     }
                 }
             }
-            //println!("{:?}", next_ids);
             poss = next_poss;
-            next_poss = vec![];
+            next_poss = HashMap::new();
         }
         println! {"row_len: {row_len} ids: {:?}", poss.len()};
-        sum += poss.len() as i32;
+        sum += poss.values().fold(0, |acc, v| acc + v);
     }
     sum
 }

@@ -33,7 +33,7 @@ fn main() {
     if args.len() > 1 && (args[1] == "a" || args[1] == "all") {
         run_all = true;
     }
-    day15::run(input("15"));
+    day12::run(input("12"));
     if run_all {
         day1::run(input("1"));
         day2::run(input("2"));
@@ -46,9 +46,9 @@ fn main() {
         day9::run(input("9"));
         day10::run(input("10"));
         day11::run(input("11"));
-        day12::run(input("12"));
         day13::run(input("13"));
         day14::run(input("14"));
+        day15::run(input("15"));
         //day16::run(input("16"));
         //day17::run(input("17"));
         //day18::run(input("18"));
