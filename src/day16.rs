@@ -78,19 +78,16 @@ fn pt1(input: &Map2D<char>, initial_beam: Beam) -> i32 {
             },
             _ => panic!(),
         }
-
         beams_seen.insert(beam.clone());
 
+        
     }
+    let mut coords: HashSet<(i32, i32)> = HashSet::new();
+    for b in beams_seen.into_iter() {
+        coords.insert((b.x, b.y));
+    } 
     input.aggregate(|_, x, y| {
-        let mut seen = false;
-        for b in beams_seen.iter() {
-            if b.x == x && b.y == y {
-                seen = true;
-                break;
-            }
-        }
-        if seen {
+        if coords.contains(&(x, y)) {
             1
         } else {
             0
@@ -131,13 +128,11 @@ fn split_h(beam: &Beam) -> Vec<Beam> {
 fn pt2(input: &Map2D<char>) -> i32 {
     let mut result = 0;
     for x in 0..input.width() {
-        println!("x: {x} y: 0");
         result = result.max(pt1(input, Beam {
             dir: 'S',
             x: x,
             y: 0
         }));
-        println!("x: {x} y: 1");
         result = result.max(pt1(input, Beam {
             dir: 'N',
             x: x,
@@ -145,13 +140,11 @@ fn pt2(input: &Map2D<char>) -> i32 {
         }));
     }
     for y in 0..input.height() {
-        println!("x: 0 y: {y}");
         result = result.max(pt1(input, Beam {
             dir: 'E',
             x: 0,
             y: y
         }));
-        println!("x: 1 y: {y}");
         result = result.max(pt1(input, Beam {
             dir: 'W',
             x: input.width() - 1,
@@ -159,14 +152,4 @@ fn pt2(input: &Map2D<char>) -> i32 {
         }));
     }
     result
-}
-
-#[cfg(test)]
-mod tests {
-    #[allow(unused_imports)]
-    use super::*;
-    #[test]
-    fn test() {
-        
-    }
 }
