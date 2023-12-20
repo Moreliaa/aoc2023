@@ -1,5 +1,5 @@
 use fancy_regex::Regex;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 use aoc_lib::map2d::Map2D;
 use std::cmp::Ordering;
 
