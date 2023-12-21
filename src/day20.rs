@@ -1,5 +1,6 @@
 use itertools::Itertools;
 use std::collections::{HashMap, VecDeque};
+use num::integer::lcm;
 
 pub fn run(input: String) {
     println!("Day20 Pt1: {}", pt1(&input));
@@ -53,14 +54,24 @@ fn parse_input<'a>(input: &'a String) -> HashMap<&'a str, Module> {
 
 fn pt1(input: &String) -> i128 {
     let mut modules = parse_input(input);
-    let mut pushes = 0;
+    let mut pushes: i128 = 0;
     let target = 1000;
     let (mut low_pulses, mut high_pulses) = (0, 0);
-    while pushes < target {
+    let mut last = 0;
+    'outer: loop {
+        /*let next = modules.values().fold(0, |acc, m| {
+            acc + m.inc.iter().fold(0, |acc2, i| {
+                acc2 + i.1
+            })
+        });
+        println!("next: {next} diff: {}",next-last);*/
+        //last = next;
         pushes += 1;
         let mut tasks = VecDeque::new();
         tasks.push_front(("broadcaster", 0, "button")); // current, pulse, source
         while let Some(task) = tasks.pop_front() {
+            //println!("{:?}", task);
+            
             if task.1 == 0 {
                 low_pulses += 1;
             } else {
@@ -98,7 +109,7 @@ fn pt1(input: &String) -> i128 {
                         (d, out, task.0)
                     }));
                 },
-                _ => continue // untyped module
+                _ => if task.1 == 0 { println!("Success {pushes}") } else { continue }// untyped module
             }
 
         }
@@ -108,7 +119,8 @@ fn pt1(input: &String) -> i128 {
 }
 
 fn pt2(input: &String) -> i32 {
-    0
+    [3889, 3881, 4021,4013].into_iter().reduce(|acc, c| lcm(acc, c)).unwrap()
+    // 2020350377 too low
 }
 
 #[cfg(test)]
