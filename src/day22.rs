@@ -26,6 +26,9 @@ fn pt1(input: &String, size: i32) -> i32 {
                     while layers.len() <= z as usize {
                         layers.push(Map2D::new(size, size, FREE));
                     }
+                    if *layers[z as usize].get(x, y).unwrap() != FREE {
+                        panic!();
+                    }
                     layers[z as usize].set(x, y, block_id);
                 }
             }
@@ -74,6 +77,9 @@ fn pt1(input: &String, size: i32) -> i32 {
                     for x_brick in *x1..=*x2 {
                         for y_brick in *y1..=*y2 {
                             for z_brick in *z1 - drop_distance as i32..=*z2 - drop_distance as i32 {
+                                if *layers[z_brick as usize].get(x_brick, y_brick).unwrap() != FREE {
+                                    panic!();
+                                }
                                 layers[z_brick as usize].set(x_brick, y_brick, block_id);
                             }
                         }
