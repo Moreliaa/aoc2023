@@ -18,7 +18,7 @@ fn pt1(input: &String, size: i32) -> i32 {
     for l in input.lines() {
         block_id+=1;
         let ((x1, y1, z1), (x2, y2, z2)) = l.split('~').map(|c| c.split(',').map(|a| a.parse::<i32>().unwrap()).collect_tuple().unwrap()).collect_tuple().unwrap();
-        blocks.insert(block_id, ((x1,y1,z1), (x2,y2,z2)));
+        blocks.insert(block_id, ((x1.min(x2),y1.min(y2),z1.min(z2)), (x2.max(x1),y2.max(y1),z2.max(z1))));
         // snapshot
         for x in x1..=x2 {
             for y in y1..=y2 {
@@ -76,7 +76,7 @@ fn pt1(input: &String, size: i32) -> i32 {
                     // place new brick
                     for x_brick in *x1..=*x2 {
                         for y_brick in *y1..=*y2 {
-                            for z_brick in *z1 - drop_distance as i32..=*z2 - drop_distance as i32 {
+                            for z_brick in (*z1 - drop_distance as i32)..=(*z2 - drop_distance as i32) {
                                 if *layers[z_brick as usize].get(x_brick, y_brick).unwrap() != FREE {
                                     panic!();
                                 }
@@ -95,7 +95,7 @@ fn pt1(input: &String, size: i32) -> i32 {
     let mut supporting: HashMap<i32, HashSet<i32>> = HashMap::new();
     let mut supported_by: HashMap<i32, HashSet<i32>> = HashMap::new();
     let mut seen_blocks: HashSet<i32> = HashSet::new();
-    for z in 2..layers.len() {
+    for z in 1..layers.len() {
         for x in 0..layers[z].width() {
             for y in 0..layers[z].height() {
                 let block_id = *layers[z].get(x,y).unwrap();
@@ -105,7 +105,7 @@ fn pt1(input: &String, size: i32) -> i32 {
                     for x_brick in *x1..=*x2 {
                         for y_brick in *y1..=*y2 {
                             let tile = *layers[z-1].get(x_brick,y_brick).unwrap();
-                            if tile != FREE {
+                            if tile != FREE && tile != FLOOR {
                                 supported_by.entry(block_id).and_modify(|e| {e.insert(tile); }).or_insert({let mut h = HashSet::new(); h.insert(tile); h});
                                 supporting.entry(tile).and_modify(|e| { e.insert(block_id);}).or_insert({let mut h = HashSet::new(); h.insert(block_id); h});
                             }
@@ -132,7 +132,7 @@ fn pt1(input: &String, size: i32) -> i32 {
     //println!("Supporting: {:?}", supporting);
     //println!("Supported by: {:?}", supported_by);
     println!("Single supports: {:?}", single_supports);
-    (blocks.len() - single_supports.len()) as i32 // 1218 too high // 414 too low
+    (blocks.len() - single_supports.len()) as i32
 }
 
 fn pt2(input: &String) -> i32 {
