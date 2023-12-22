@@ -3,14 +3,15 @@ use itertools::Itertools;
 use std::collections::{HashMap, HashSet};
 
 pub fn run(input: String) {
-    println!("Day22 Pt1: {}", pt1(&input, 10));
-    println!("Day22 Pt2: {}", pt2(&input));
+    let (pt1_result, blocks_len, supported_by, supporting) = pt1(&input, 10);
+    println!("Day22 Pt1: {}", pt1_result);
+    println!("Day22 Pt2: {}", pt2(blocks_len, supported_by, supporting));
 }
 
 const FREE: i32 = 0;
 const FLOOR: i32 = 1;
 
-fn pt1(input: &String, size: i32) -> i32 {
+fn pt1(input: &String, size: i32) -> (i32, usize, HashMap<i32, HashSet<i32>>, HashMap<i32, HashSet<i32>>) {
     let mut layers: Vec<Map2D<i32>> = vec![Map2D::new(size, size, FLOOR)];
     let mut block_id = 1;
     let mut blocks:HashMap<i32, ((i32,i32,i32),(i32,i32,i32))> = HashMap::new();
@@ -122,36 +123,30 @@ fn pt1(input: &String, size: i32) -> i32 {
             single_supports.extend(v);
         }
     }
-
-    /*for z in (0..layers.len()).rev() {
-        print!("=={z}==");
-        layers[z].print();
-        println!();
-    }*/
-
-    //println!("Supporting: {:?}", supporting);
-    //println!("Supported by: {:?}", supported_by);
-    println!("Single supports: {:?}", single_supports);
-    (blocks.len() - single_supports.len()) as i32
+    ((blocks.len() - single_supports.len()) as i32, blocks.len(), supported_by, supporting)
 }
 
-fn pt2(input: &String) -> i32 {
-    0
-}
-
-#[cfg(test)]
-mod tests {
-    #[allow(unused_imports)]
-    use super::*;
-    #[test]
-    fn test() {
-        let input = "1,0,1~1,2,1
-0,0,2~2,0,2
-0,2,3~2,2,3
-0,0,4~0,2,4
-2,0,5~2,2,5
-0,1,6~2,1,6
-1,1,8~1,1,9".to_string();
-        assert_eq!(pt1(&input, 3), 5);
+fn pt2(blocks_len: usize, supported_by: HashMap<i32, HashSet<i32>>, supporting: HashMap<i32, HashSet<i32>>) -> i32 {
+    let mut blocks_falling: HashMap<i32, usize> = HashMap::new();
+    for idx in 0..blocks_len {
+        let block_id = idx  as i32 + 2;
+        let mut remaining_supported_blocks = supported_by.clone();
+        let mut blocks_to_remove = vec![block_id];
+        while let Some(block_to_remove) = blocks_to_remove.pop() {
+            let supported_blocks = match supporting.get(&block_to_remove) {
+                Some(val) => val,
+                None => continue
+            };
+            
+            for s in supported_blocks {
+                remaining_supported_blocks.entry(*s).and_modify(|e| {e.remove(&block_to_remove); });
+                if remaining_supported_blocks.contains_key(s) && remaining_supported_blocks.get(s).unwrap().len() == 0 {
+                    remaining_supported_blocks.remove(s);
+                    blocks_to_remove.push(*s);
+                }
+            }
+        }
+        blocks_falling.insert(block_id, supported_by.len() - remaining_supported_blocks.len());
     }
+    blocks_falling.values().fold(0, |acc, v| acc + v) as i32
 }
