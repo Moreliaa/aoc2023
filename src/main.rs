@@ -7,7 +7,15 @@ mod day12;
 mod day13;
 mod day14;
 mod day15;
+mod day16;
+mod day17;
+mod day18;
+mod day19;
 mod day2;
+mod day20;
+mod day21;
+mod day22;
+mod day23;
 mod day3;
 mod day4;
 mod day5;
@@ -15,14 +23,6 @@ mod day6;
 mod day7;
 mod day8;
 mod day9;
-mod day16;
-mod day17;
-mod day18;
-mod day19;
-mod day20;
-mod day21;
-mod day22;
-//mod day23;
 //mod day24;
 //mod day25;
 
@@ -33,7 +33,7 @@ fn main() {
     if args.len() > 1 && (args[1] == "a" || args[1] == "all") {
         run_all = true;
     }
-    day22::run(input("22"));
+    day23::run(input("23"));
     if run_all {
         day1::run(input("1"));
         day2::run(input("2"));
@@ -56,7 +56,7 @@ fn main() {
         day19::run(input("19"));
         day20::run(input("20"));
         day21::run(input("21"));
-        //day23::run(input("23"));
+        day22::run(input("22"));
         //day24::run(input("24"));
         //day25::run();
     }

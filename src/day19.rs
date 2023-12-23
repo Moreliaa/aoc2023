@@ -15,17 +15,17 @@ struct Rule<'a> {
     attr: &'a str,
     op: &'a str,
     val: i32,
-    result: &'a str
+    result: &'a str,
 }
 
 struct Part {
     x: i32,
     m: i32,
     a: i32,
-    s: i32
+    s: i32,
 }
 
-fn parse_input<'a>(input: &'a String) -> (HashMap<&'a str, Vec<Rule>>, Vec<Part>){
+fn parse_input<'a>(input: &'a String) -> (HashMap<&'a str, Vec<Rule>>, Vec<Part>) {
     let re_workflow = Regex::new(r"(.+){(.+)}").unwrap();
     let re_rule = Regex::new(r"(.)(.)(\d+):(.+)").unwrap(); // attribute, operator, number, workflow/accept/reject
     let re_ratings = Regex::new(r"{x=(.+),m=(.+),a=(.+),s=(.+)}").unwrap();
@@ -60,7 +60,7 @@ fn parse_input<'a>(input: &'a String) -> (HashMap<&'a str, Vec<Rule>>, Vec<Part>
                         attr: "x",
                         op: ">",
                         val: i32::MIN,
-                        result: r
+                        result: r,
                     });
                 };
             }
@@ -115,7 +115,7 @@ fn check_part(workflows: &HashMap<&str, Vec<Rule>>, part: &Part) -> bool {
                 next_workflow => {
                     current_workflow = next_workflow;
                     break;
-                },
+                }
             }
         }
     }
@@ -134,26 +134,30 @@ struct State {
 }
 
 fn pt2(workflows: &HashMap<&str, Vec<Rule>>) -> i128 {
-    work(workflows, "in", State {
-        x_min: 1,
-        m_min: 1,
-        a_min: 1,
-        s_min: 1,
-        x_max: 4000,
-        m_max: 4000,
-        a_max: 4000,
-        s_max: 4000,
-    })
+    work(
+        workflows,
+        "in",
+        State {
+            x_min: 1,
+            m_min: 1,
+            a_min: 1,
+            s_min: 1,
+            x_max: 4000,
+            m_max: 4000,
+            a_max: 4000,
+            s_max: 4000,
+        },
+    )
 }
 
 fn work(workflows: &HashMap<&str, Vec<Rule>>, current_workflow: &str, state: State) -> i128 {
     match current_workflow {
-        ACCEPT => return (
-            (state.x_max - state.x_min + 1) as i128 *
-            (state.m_max - state.m_min + 1) as i128 *
-            (state.a_max - state.a_min + 1) as i128 *
-            (state.s_max - state.s_min + 1) as i128 
-        ) as i128,
+        ACCEPT => {
+            return ((state.x_max - state.x_min + 1) as i128
+                * (state.m_max - state.m_min + 1) as i128
+                * (state.a_max - state.a_min + 1) as i128
+                * (state.s_max - state.s_min + 1) as i128) as i128
+        }
         REJECT => return 0,
         _ => (),
     };
@@ -162,14 +166,12 @@ fn work(workflows: &HashMap<&str, Vec<Rule>>, current_workflow: &str, state: Sta
     for r in workflows.get(current_workflow).unwrap() {
         match r.result {
             ACCEPT => {
-                acc += (
-                    (state.x_max - state.x_min + 1) as i128 *
-                    (state.m_max - state.m_min + 1) as i128 *
-                    (state.a_max - state.a_min + 1) as i128 *
-                    (state.s_max - state.s_min + 1) as i128
-                ) as i128;
+                acc += ((state.x_max - state.x_min + 1) as i128
+                    * (state.m_max - state.m_min + 1) as i128
+                    * (state.a_max - state.a_min + 1) as i128
+                    * (state.s_max - state.s_min + 1) as i128) as i128;
                 continue;
-            },
+            }
             REJECT => continue,
             _ => (),
         };
@@ -182,22 +184,22 @@ fn work(workflows: &HashMap<&str, Vec<Rule>>, current_workflow: &str, state: Sta
                     "x" if state.x_max > r.val => {
                         sub_state.x_min = r.val.max(sub_state.x_min);
                         acc += work(workflows, r.result, sub_state);
-                    },
+                    }
                     "m" if state.m_max > r.val => {
                         sub_state.m_min = r.val.max(sub_state.m_min);
                         acc += work(workflows, r.result, sub_state);
-                    },
+                    }
                     "a" if state.a_max > r.val => {
                         sub_state.a_min = r.val.max(sub_state.a_min);
                         acc += work(workflows, r.result, sub_state);
-                    },
+                    }
                     "s" if state.s_max > r.val => {
                         sub_state.s_min = r.val.max(sub_state.s_min);
                         acc += work(workflows, r.result, sub_state);
-                    },
+                    }
                     _ => panic!(),
                 };
-            },
+            }
             "<" => {
                 // check success path
                 let mut sub_state = state.clone();
@@ -205,22 +207,22 @@ fn work(workflows: &HashMap<&str, Vec<Rule>>, current_workflow: &str, state: Sta
                     "x" if state.x_min < r.val => {
                         sub_state.x_max = r.val.min(sub_state.x_max);
                         acc += work(workflows, r.result, sub_state);
-                    },
+                    }
                     "m" if state.m_min < r.val => {
                         sub_state.m_max = r.val.min(sub_state.m_max);
                         acc += work(workflows, r.result, sub_state);
-                    },
+                    }
                     "a" if state.a_min < r.val => {
                         sub_state.a_max = r.val.min(sub_state.a_max);
                         acc += work(workflows, r.result, sub_state);
-                    },
+                    }
                     "s" if state.s_min < r.val => {
                         sub_state.s_max = r.val.min(sub_state.s_max);
                         acc += work(workflows, r.result, sub_state);
-                    },
+                    }
                     _ => panic!(),
                 };
-            },
+            }
             _ => panic!(),
         };
     }
@@ -249,6 +251,7 @@ hdj{m>838:A,pv}
 {x=1679,m=44,a=2067,s=496}
 {x=2036,m=264,a=79,s=2244}
 {x=2461,m=1339,a=466,s=291}
-{x=2127,m=1623,a=2188,s=1013}".to_string());        
+{x=2127,m=1623,a=2188,s=1013}"
+            .to_string());
     }
 }

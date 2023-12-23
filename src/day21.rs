@@ -1,5 +1,8 @@
 use aoc_lib::map2d::Map2D;
-use std::{collections::{HashMap, VecDeque}, thread::current};
+use std::{
+    collections::{HashMap, VecDeque},
+    thread::current,
+};
 
 pub fn run(input: String) {
     let mut map = Map2D::from_string(input.clone());
@@ -7,7 +10,6 @@ pub fn run(input: String) {
     let mut map = Map2D::from_string(input.clone());
     println!("Day21 Pt2: {}", pt2(&mut map));
 }
-
 
 fn pt1(input: &mut Map2D<char>, target: i32) -> i32 {
     let mut seen: HashMap<(i32, i32), i32> = HashMap::new();
@@ -17,7 +19,7 @@ fn pt1(input: &mut Map2D<char>, target: i32) -> i32 {
     let mut y_start = 0;
     'x: for x in 0..input.width() {
         for y in 0..input.height() {
-            if *input.get(x,y).unwrap() == 'S' {
+            if *input.get(x, y).unwrap() == 'S' {
                 x_start = x;
                 y_start = y;
                 break 'x;
@@ -45,7 +47,7 @@ fn pt1(input: &mut Map2D<char>, target: i32) -> i32 {
         }
         for i in 0..dir.len() {
             let d = dir[i];
-            let next_coords = (current_node.0.0 + d.0, current_node.0.1 + d.1);
+            let next_coords = (current_node.0 .0 + d.0, current_node.0 .1 + d.1);
             if let Some(tile) = input.get(next_coords.0, next_coords.1) {
                 if (*tile == '.' || *tile == 'S') && !seen.contains_key(&next_coords) {
                     unseen.push_back((next_coords, next_steps));
@@ -63,8 +65,8 @@ fn pt1(input: &mut Map2D<char>, target: i32) -> i32 {
 
 fn pt2(input: &mut Map2D<char>) -> i32 {
     let target = 26501365;
-    let target =64;
-    
+    let target = 64;
+
     let mut seen: HashMap<(i32, i32), i32> = HashMap::new();
     let mut unseen: VecDeque<((i32, i32), i32)> = VecDeque::new();
 
@@ -72,7 +74,7 @@ fn pt2(input: &mut Map2D<char>) -> i32 {
     let mut y_start = 0;
     'x: for x in 0..input.width() {
         for y in 0..input.height() {
-            if *input.get(x,y).unwrap() == 'S' {
+            if *input.get(x, y).unwrap() == 'S' {
                 x_start = x;
                 y_start = y;
                 break 'x;
@@ -100,7 +102,7 @@ fn pt2(input: &mut Map2D<char>) -> i32 {
         }
         for i in 0..dir.len() {
             let d = dir[i];
-            let mut next_coords = (current_node.0.0 + d.0, current_node.0.1 + d.1);
+            let mut next_coords = (current_node.0 .0 + d.0, current_node.0 .1 + d.1);
             if next_coords.0 < 0 {
                 next_coords.0 += input.width();
             }
@@ -114,7 +116,6 @@ fn pt2(input: &mut Map2D<char>) -> i32 {
                 next_coords.1 -= input.height();
             }
 
-
             if let Some(tile) = input.get(next_coords.0, next_coords.1) {
                 if (*tile == '.' || *tile == 'S') && !seen.contains_key(&next_coords) {
                     unseen.push_back((next_coords, next_steps));
@@ -124,8 +125,9 @@ fn pt2(input: &mut Map2D<char>) -> i32 {
     }
     println!("{:?}", seen.keys());
     for s in seen.keys() {
-        if s.0 != x_start || s.1 != y_start{
-        input.set(s.0, s.1, 'O');}
+        if s.0 != x_start || s.1 != y_start {
+            input.set(s.0, s.1, 'O');
+        }
     }
     input.print();
     seen.len() as i32
@@ -147,7 +149,8 @@ mod tests {
 .......##..
 .##.#.####.
 .##..##.##.
-...........".to_string();
+..........."
+            .to_string();
         let mut map = Map2D::from_string(input);
         assert_eq!(pt1(&mut map, 6), 16);
     }

@@ -129,14 +129,17 @@ fn pt2(input: &String) -> i128 {
         for _ in 0..4 {
             numbers.append(&mut numbers_cloned.clone());
         }
-        let mut poss:HashMap<Node, i128> = HashMap::new();
-        poss.insert(Node {
-            count: 0,
-            current_num_idx: 0,
-            last_spring: false,
-            is_failure: false,
-        }, 1);
-        let mut next_poss:HashMap<Node, i128> = HashMap::new();
+        let mut poss: HashMap<Node, i128> = HashMap::new();
+        poss.insert(
+            Node {
+                count: 0,
+                current_num_idx: 0,
+                last_spring: false,
+                is_failure: false,
+            },
+            1,
+        );
+        let mut next_poss: HashMap<Node, i128> = HashMap::new();
         let row_len = row.len();
         for (row_idx, c) in row.iter().enumerate() {
             println! {"row_len: {row_len} row_idx: {row_idx} ids: {:?}", poss.len()};
@@ -191,7 +194,12 @@ fn pt2(input: &String) -> i128 {
                     }
 
                     if !next_node.is_failure {
-                        next_poss.entry(next_node).and_modify(|v| {*v += instances;}).or_insert(instances);
+                        next_poss
+                            .entry(next_node)
+                            .and_modify(|v| {
+                                *v += instances;
+                            })
+                            .or_insert(instances);
                     }
 
                     // ? -> .
@@ -228,7 +236,12 @@ fn pt2(input: &String) -> i128 {
                         };
                     }
                     if !next_node.is_failure {
-                        next_poss.entry(next_node).and_modify(|v| {*v += instances;}).or_insert(instances);
+                        next_poss
+                            .entry(next_node)
+                            .and_modify(|v| {
+                                *v += instances;
+                            })
+                            .or_insert(instances);
                     }
                 } else {
                     // # / .
@@ -279,7 +292,12 @@ fn pt2(input: &String) -> i128 {
                         };
                     }
                     if !p.is_failure {
-                        next_poss.entry(p.clone()).and_modify(|v| {*v += instances;}).or_insert(instances);
+                        next_poss
+                            .entry(p.clone())
+                            .and_modify(|v| {
+                                *v += instances;
+                            })
+                            .or_insert(instances);
                     }
                 }
             }

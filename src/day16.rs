@@ -3,20 +3,25 @@ use std::collections::HashSet;
 
 pub fn run(input: String) {
     let input = Map2D::from_string(input);
-    println!("Day16 Pt1: {}", pt1(&input, Beam {
-        dir: 'E',
-        x: 0,
-        y: 0
-    }));
+    println!(
+        "Day16 Pt1: {}",
+        pt1(
+            &input,
+            Beam {
+                dir: 'E',
+                x: 0,
+                y: 0
+            }
+        )
+    );
     println!("Day16 Pt2: {}", pt2(&input));
 }
-
 
 #[derive(PartialEq, Eq, Hash, Clone)]
 struct Beam {
     dir: char,
     x: i32,
-    y: i32
+    y: i32,
 }
 
 fn pt1(input: &Map2D<char>, initial_beam: Beam) -> i32 {
@@ -31,26 +36,22 @@ fn pt1(input: &Map2D<char>, initial_beam: Beam) -> i32 {
 
         let tile = match input.get(beam.x, beam.y) {
             None => continue,
-            Some(val) => *val
+            Some(val) => *val,
         };
 
         match tile {
             '.' => {
                 beams_next.push(pass(&beam));
+            }
+            '|' => match beam.dir {
+                'N' | 'S' => beams_next.push(pass(&beam)),
+                'E' | 'W' => beams_next.extend(split_v(&beam)),
+                _ => panic!(),
             },
-            '|' => {
-                match beam.dir {
-                    'N' | 'S' => beams_next.push(pass(&beam)),
-                    'E' | 'W' => beams_next.extend(split_v(&beam)),
-                    _ => panic!()
-                }
-            },
-            '-' => {
-                match beam.dir {
-                    'E' | 'W' => beams_next.push(pass(&beam)),
-                    'N' | 'S' => beams_next.extend(split_h(&beam)),
-                    _ => panic!()
-                }
+            '-' => match beam.dir {
+                'E' | 'W' => beams_next.push(pass(&beam)),
+                'N' | 'S' => beams_next.extend(split_h(&beam)),
+                _ => panic!(),
             },
             '\\' => {
                 let new_dir = match beam.dir {
@@ -58,41 +59,33 @@ fn pt1(input: &Map2D<char>, initial_beam: Beam) -> i32 {
                     'S' => 'E',
                     'W' => 'N',
                     'E' => 'S',
-                    _ => panic!()
+                    _ => panic!(),
                 };
                 let mut new_beam = beam.clone();
                 new_beam.dir = new_dir;
                 beams_next.push(pass(&new_beam));
-            },
+            }
             '/' => {
                 let new_dir = match beam.dir {
                     'N' => 'E',
                     'S' => 'W',
                     'W' => 'S',
                     'E' => 'N',
-                    _ => panic!()
+                    _ => panic!(),
                 };
                 let mut new_beam = beam.clone();
                 new_beam.dir = new_dir;
                 beams_next.push(pass(&new_beam));
-            },
+            }
             _ => panic!(),
         }
         beams_seen.insert(beam.clone());
-
-        
     }
     let mut coords: HashSet<(i32, i32)> = HashSet::new();
     for b in beams_seen.into_iter() {
         coords.insert((b.x, b.y));
-    } 
-    input.aggregate(|_, x, y| {
-        if coords.contains(&(x, y)) {
-            1
-        } else {
-            0
-        }
-    })
+    }
+    input.aggregate(|_, x, y| if coords.contains(&(x, y)) { 1 } else { 0 })
 }
 
 fn pass(beam: &Beam) -> Beam {
@@ -102,7 +95,7 @@ fn pass(beam: &Beam) -> Beam {
         'S' => (0, 1),
         'W' => (-1, 0),
         'E' => (1, 0),
-        _ => panic!()
+        _ => panic!(),
     };
     result.x += x;
     result.y += y;
@@ -128,28 +121,40 @@ fn split_h(beam: &Beam) -> Vec<Beam> {
 fn pt2(input: &Map2D<char>) -> i32 {
     let mut result = 0;
     for x in 0..input.width() {
-        result = result.max(pt1(input, Beam {
-            dir: 'S',
-            x: x,
-            y: 0
-        }));
-        result = result.max(pt1(input, Beam {
-            dir: 'N',
-            x: x,
-            y: input.height() - 1
-        }));
+        result = result.max(pt1(
+            input,
+            Beam {
+                dir: 'S',
+                x: x,
+                y: 0,
+            },
+        ));
+        result = result.max(pt1(
+            input,
+            Beam {
+                dir: 'N',
+                x: x,
+                y: input.height() - 1,
+            },
+        ));
     }
     for y in 0..input.height() {
-        result = result.max(pt1(input, Beam {
-            dir: 'E',
-            x: 0,
-            y: y
-        }));
-        result = result.max(pt1(input, Beam {
-            dir: 'W',
-            x: input.width() - 1,
-            y: y
-        }));
+        result = result.max(pt1(
+            input,
+            Beam {
+                dir: 'E',
+                x: 0,
+                y: y,
+            },
+        ));
+        result = result.max(pt1(
+            input,
+            Beam {
+                dir: 'W',
+                x: input.width() - 1,
+                y: y,
+            },
+        ));
     }
     result
 }
