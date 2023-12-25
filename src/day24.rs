@@ -28,6 +28,7 @@ fn pt1(input: &String, range_min: f64, range_max: f64) -> i128 {
 fn check_intersection(line1_x0:i128, line1_y0:i128, line1_x1:i128, line1_y1:i128, line2_x0:i128, line2_y0:i128, line2_x1:i128, line2_y1:i128) -> Option<(f64,f64)> {
     let denominator = ((line2_y1 - line2_y0) * (line1_x1 - line1_x0)) - ((line2_x1 - line2_x0) * (line1_y1 - line1_y0));
     if denominator == 0 {
+        println!("{} {}, {} {}", line1_x1 - line1_x0, line1_y1 - line1_y0, line2_x1 - line2_x0, line2_y1 - line2_y0);
         return None;
     }
     let line1_x0 = line1_x0 as f64;
