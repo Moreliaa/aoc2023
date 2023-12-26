@@ -24,7 +24,7 @@ mod day7;
 mod day8;
 mod day9;
 mod day24;
-//mod day25;
+mod day25;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -33,7 +33,7 @@ fn main() {
     if args.len() > 1 && (args[1] == "a" || args[1] == "all") {
         run_all = true;
     }
-    day24::run(input("24"));
+    day25::run(input("25"));
     if run_all {
         day1::run(input("1"));
         day2::run(input("2"));
@@ -58,7 +58,7 @@ fn main() {
         day21::run(input("21"));
         day22::run(input("22"));
         day23::run(input("23"));
-        //day25::run();
+        day24::run(input("24"));
     }
 }
 
