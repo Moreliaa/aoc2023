@@ -3,100 +3,81 @@ use std::collections::{HashMap, HashSet};
 use itertools::Itertools;
 
 pub fn run(input: String) {
-    println!("Day25 Pt1: {}", pt1(&input));
+    println!("Day25 Pt1: {}", pt1(&input, 2));
     println!("Day25 Pt2: {}", pt2(&input));
 }
 
-fn pt1(input: &String) -> i32 {
-    let mut comp: HashMap<&str, HashSet<&str>> = HashMap::new();
-    let mut comp_no_dupes: HashMap<&str, HashSet<&str>> = HashMap::new();
+fn pt1(input: &String, target_vertices: usize) -> i32 {
+    let mut comp: HashMap<&str, HashMap<&str, i32>> = HashMap::new();
+    let mut start_node = "";
     for l in input.lines() {
         let mut split = l.split(": ");
         let c = split.next().unwrap();
+        start_node = c;
         for other in split.next().unwrap().split(" ") {
-            comp.entry(c).and_modify(|e| {e.insert(other);}).or_insert(HashSet::from([other]));
-            comp.entry(other).and_modify(|e| {e.insert(c);}).or_insert(HashSet::from([c]));
-            
-            comp_no_dupes.entry(c).and_modify(|e| {e.insert(other);}).or_insert(HashSet::from([other]));
+            comp.entry(c).and_modify(|e| {e.insert(other, 1);}).or_insert(HashMap::from([(other, 1)]));
+            comp.entry(other).and_modify(|e| {e.insert(c, 1);}).or_insert(HashMap::from([(c, 1)]));
         }
     }
-    let mut counter = 0;
-    for (key1, val1) in comp_no_dupes.iter() {
-        for (key2, val2) in comp_no_dupes.iter() {
-            for (key3, val3) in comp_no_dupes.iter() {
-                for conn1 in val1 {
-                    for conn2 in val2 {
-                        for conn3 in val3 {
-                            counter += 1;
-                            if counter % 100000 == 0 {
-                                println!("{counter}");
-                            }
-                            let mut comp_cloned = comp.clone();
-                            comp_cloned.entry(key1).and_modify(|e| {e.remove(conn1);});
-                            comp_cloned.entry(conn1).and_modify(|e| {e.remove(key1);});
-                            
-                            let mut skip = false;
-                            comp_cloned.entry(key2).and_modify(|e| {
-                                let was_removed = e.remove(conn2);
-                                if !was_removed {
-                                    skip = true;
-                                }
-                            });
-                            comp_cloned.entry(conn2).and_modify(|e| {
-                                let was_removed = e.remove(key2);
-                                if !was_removed {
-                                    skip = true;
-                                }
-                            });
 
-                            comp_cloned.entry(key3).and_modify(|e| {
-                                let was_removed = e.remove(conn3);
-                                if !was_removed {
-                                    skip = true;
-                                }
-                            });
-                            comp_cloned.entry(conn3).and_modify(|e| {
-                                let was_removed = e.remove(key3);
-                                if !was_removed {
-                                    skip = true;
-                                }
-                            });
-                            if skip {
-                                continue;
-                            }
-                            let g = find_groups(&comp_cloned);
-                            if g.len() == 2 {
-                                println!("{key1}->{conn1} {key2}->{conn2} {key3}->{conn3} {:?}", g);
-                                return g.into_iter().fold(1, |acc, val| acc * val);
-                            }
-                        }
+    let node_count_total = comp.len();
+
+    // Stoer-Wagner
+
+    let mut current_best_weight = std::i32::MAX;
+    let mut current_best_len = node_count_total;
+    while comp.len() >= target_vertices {
+        println!("{}", comp.len());
+        // Maximum Adjacency Search
+        let comp_binding = comp.clone();
+        let mut candidates: HashSet<&&str> = comp_binding.keys().collect();
+        candidates.remove(&start_node);
+        let mut seen_candidates: HashSet<&&str> = HashSet::from([&start_node]);
+
+        let mut weights: Vec<(&&str, i32)> = vec![];
+        while candidates.len() > 0 {
+            let mut max_candidate = None;
+            let mut max_weight = std::i32::MIN;
+            for c in candidates.iter() {
+                let mut weight = 0;
+                for (other, w) in comp.get(*c).unwrap() {
+                    if seen_candidates.contains(other) {
+                        weight += w;
                     }
                 }
-            }
-        }   
-    }
-    /*for i in 0..wires.len() - 2 {
-        for j in i + 1..wires.len() - 1 {
-            for k in j + 1..wires.len() {
-                let mut comp_cloned = comp.clone();
-                comp_cloned.remove(wires[i]);
-                comp_cloned.remove(wires[j]);
-                comp_cloned.remove(wires[k]);
-                for (_, v) in comp_cloned.iter_mut() {
-                    v.remove(wires[i]);
-                    v.remove(wires[j]);
-                    v.remove(wires[k]);
-                }
-                let g = find_groups(&cloned_comp);
-                if g.len() == 2 {
-                    return g.into_iter().fold(1, |acc, val| acc * val);
+                if weight > max_weight {
+                    max_weight = weight;
+                    max_candidate = Some(c.clone());
                 }
             }
+            let max_candidate = max_candidate.unwrap();
+            weights.push((max_candidate, max_weight));
+            candidates.remove(max_candidate);
+            seen_candidates.insert(&max_candidate);
         }
-    }*/
-    panic!();
+        // merge s into t
+        let t = weights.last().unwrap();
+        let s = weights.last().unwrap();
+        let weight_cut = t.1;
 
-    
+        for (other, w) in comp_binding.get(s.0).unwrap() {
+            comp.entry(t.0).and_modify(|e| {
+                e.entry(other).and_modify(|e2| { *e2 += w; } ).or_insert(1);
+            });
+            comp.entry(other).and_modify(|e| {
+                e.entry(t.0).and_modify(|e2| { *e2 += w; } ).or_insert(1);
+                e.remove(s.0);
+            });
+        }
+        comp.remove(s.0);
+
+        if weight_cut < current_best_weight {
+            current_best_len = comp.len();
+            current_best_weight = weight_cut;
+            println!("{:?}", seen_candidates);
+        }
+    }
+    (current_best_len * (node_count_total - current_best_len)) as i32 // > 480654
 }
 
 fn find_groups(comp: &HashMap<&str, HashSet<&str>>) -> Vec<i32> {
@@ -145,6 +126,6 @@ nvd: lhk
 lsr: lhk
 rzs: qnr cmg lsr rsh
 frs: qnr lhk lsr".to_string();
-        assert_eq!(pt1(&input), 54);
+        assert_eq!(pt1(&input, 2), 54);
     }
 }
